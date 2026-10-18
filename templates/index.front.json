@@ -1,0 +1,41 @@
+{
+  "sections": {
+    "cover": {
+      "type": "hh-house-cover",
+      "settings": {
+        "house": "from-a-house",
+        "style": "front",
+        "button_label": "See the House",
+        "house_view": "house",
+        "show_intro": false,
+        "fallback_cover": "#E7E6EF"
+      }
+    },
+    "series": {
+      "type": "hh-series",
+      "blocks": {
+        "upcoming_002": {
+          "type": "upcoming",
+          "settings": { "number": "002", "label": "In preparation", "status": "Not yet published" }
+        }
+      },
+      "block_order": ["upcoming_002"],
+      "settings": {
+        "title": "The series",
+        "lede": "Humble Haus publishes Houses: numbered collections, each around a place or a mood.",
+        "house_view": "house"
+      }
+    },
+    "signup": {
+      "type": "hh-signup",
+      "settings": {
+        "title": "Hear when Haus 002 is published",
+        "sub": "One email per House. Nothing else.",
+        "button": "Tell me",
+        "thanks": "Thank you. One email when the next House is published.",
+        "tags": "newsletter,hh-next-house"
+      }
+    }
+  },
+  "order": ["cover", "series", "signup"]
+}

@@ -1,0 +1,32 @@
+{%- comment -%}
+  A piece on a shelf: photo, number, name, credit line, price in mono (HH-045).
+  An Original that is no longer available stays on the shelf, paler, tagged "Gone",
+  with "On record" in place of the price (HH-024).
+
+  Accepts:
+  - product: {Object}
+{%- endcomment -%}
+{%- liquid
+  assign hh_shelf = product.metafields.humble_haus.shelf.value | default: 'Original'
+  assign hh_gone = false
+  if hh_shelf != 'In print' and product.available == false
+    assign hh_gone = true
+  endif
+  assign hh_credit = product.metafields.humble_haus.credit.value
+-%}
+<a class="hh-card{% if hh_gone %} hh-card--gone{% endif %}" href="{{ product.url }}">
+  <div class="hh-card__media">
+    {%- if product.featured_media -%}
+      {{ product.featured_media | image_url: width: 900 | image_tag: loading: 'lazy', widths: '300, 450, 600, 900', sizes: '(min-width: 750px) 33vw, 50vw', alt: product.featured_media.alt | default: product.title }}
+    {%- endif -%}
+    {%- if hh_gone -%}<span class="hh-badge hh-badge--quiet hh-card__tag">Gone</span>{%- endif -%}
+  </div>
+  {%- render 'hh-piece-number', product: product, class: 'hh-card__no hh-soft' -%}
+  <p class="hh-card__name">{{ product.title | escape }}</p>
+  {%- if hh_credit != blank -%}<p class="hh-card__credit hh-soft">{{ hh_credit | escape }}</p>{%- endif -%}
+  {%- if hh_gone -%}
+    <p class="hh-card__price hh-mono">On record</p>
+  {%- else -%}
+    <p class="hh-card__price hh-mono">{{ product.price | money }}</p>
+  {%- endif -%}
+</a>

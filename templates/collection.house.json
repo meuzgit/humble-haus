@@ -1,0 +1,26 @@
+{
+  "sections": {
+    "cover": {
+      "type": "hh-house-cover",
+      "settings": {
+        "house": "",
+        "style": "band",
+        "button_label": "See the House",
+        "house_view": "",
+        "show_intro": true,
+        "fallback_cover": "#E7E6EF"
+      }
+    },
+    "shelves": {
+      "type": "hh-shelves",
+      "settings": {
+        "originals_title": "Originals",
+        "originals_line": "One of each. When a piece is gone, it stays here on record.",
+        "print_title": "In print",
+        "print_line": "Made or chosen for this House. Stays available.",
+        "show_empty_print": false
+      }
+    }
+  },
+  "order": ["cover", "shelves"]
+}

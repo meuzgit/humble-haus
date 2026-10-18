@@ -1,0 +1,64 @@
+{%- comment -%}
+  The two shelves of a House (HH-023): Originals, then In print.
+  The shelf comes from the product metafield humble_haus.shelf ("Original" or "In print").
+  A piece with no shelf set is treated as an Original.
+  Pieces are shown in the collection's own order (sort the collection by hand in admin
+  to follow the piece numbers). No filters, sorting, search or pagination controls (HH-045).
+{%- endcomment -%}
+{{ 'hh.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign hh_has_print = false
+  for p in collection.products limit: 50
+    if p.metafields.humble_haus.shelf.value == 'In print'
+      assign hh_has_print = true
+      break
+    endif
+  endfor
+-%}
+<div class="hh">
+  <div class="hh-wrap">
+    <section class="hh-shelf" aria-labelledby="hh-shelf-originals">
+      <div class="hh-shelf__head">
+        <h2 class="hh-shelf__title" id="hh-shelf-originals">{{ section.settings.originals_title | escape }}</h2>
+        <p class="hh-shelf__line hh-soft">{{ section.settings.originals_line | escape }}</p>
+      </div>
+      <div class="hh-grid">
+        {%- for p in collection.products limit: 50 -%}
+          {%- unless p.metafields.humble_haus.shelf.value == 'In print' -%}
+            {%- render 'hh-piece-card', product: p -%}
+          {%- endunless -%}
+        {%- endfor -%}
+      </div>
+    </section>
+
+    {%- if hh_has_print or section.settings.show_empty_print -%}
+      <section class="hh-shelf" aria-labelledby="hh-shelf-print">
+        <div class="hh-shelf__head">
+          <h2 class="hh-shelf__title" id="hh-shelf-print">{{ section.settings.print_title | escape }}</h2>
+          <p class="hh-shelf__line hh-soft">{{ section.settings.print_line | escape }}</p>
+        </div>
+        <div class="hh-grid">
+          {%- for p in collection.products limit: 50 -%}
+            {%- if p.metafields.humble_haus.shelf.value == 'In print' -%}
+              {%- render 'hh-piece-card', product: p -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </section>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HH · Two shelves",
+  "class": "hh-section",
+  "settings": [
+    { "type": "text", "id": "originals_title", "label": "Originals heading", "default": "Originals" },
+    { "type": "text", "id": "originals_line", "label": "Originals line", "default": "One of each. When a piece is gone, it stays here on record." },
+    { "type": "text", "id": "print_title", "label": "In print heading", "default": "In print" },
+    { "type": "text", "id": "print_line", "label": "In print line", "default": "Made or chosen for this House. Stays available." },
+    { "type": "checkbox", "id": "show_empty_print", "label": "Show the In print shelf when it is empty", "default": false }
+  ]
+}
+{% endschema %}

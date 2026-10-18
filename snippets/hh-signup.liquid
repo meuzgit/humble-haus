@@ -1,0 +1,27 @@
+{%- comment -%}
+  The one sign-up box (HH-024, HH-045). Used by the HH · Sign-up section and under a gone piece.
+
+  Accepts:
+  - title, sub, button, thanks, tags: {String}
+{%- endcomment -%}
+<div class="hh hh-signup">
+  <div class="hh-wrap">
+    <div class="hh-signup__box">
+      <div>
+        <h2 class="hh-signup__title">{{ title | escape }}</h2>
+        {%- if sub != blank -%}<p class="hh-signup__sub">{{ sub | escape }}</p>{%- endif -%}
+      </div>
+      {%- form 'customer', class: 'hh-signup__form', id: 'hh-signup-form' -%}
+        <input type="hidden" name="contact[tags]" value="{{ tags | escape }}">
+        {%- if form.posted_successfully? -%}
+          <p class="hh-signup__note" role="status">{{ thanks | escape }}</p>
+        {%- else -%}
+          <label class="visually-hidden" for="hh-signup-email">Email</label>
+          <input class="hh-signup__input" id="hh-signup-email" type="email" name="contact[email]" placeholder="your@email" autocomplete="email" required>
+          <button class="hh-button" type="submit">{{ button | escape }}</button>
+          {%- if form.errors -%}<p class="hh-signup__note" role="alert">{{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}</p>{%- endif -%}
+        {%- endif -%}
+      {%- endform -%}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,137 @@
+{%- comment -%}
+  A piece (HH-045 screens 03 and 04).
+  Main photo (the plinth shot, HH-038) with up to three small ones under it; the number,
+  the Original / In print badge, name, credit line, the writing (HH-037), condition, size,
+  price in mono, one button, one line on shipping.
+  An Original that is no longer available is a gone piece (HH-024): the page stays up,
+  paler, tagged "Gone", condition "as sold", with no price and no button.
+
+  Product metafields read (namespace humble_haus): shelf, piece_number, credit,
+  condition, size, companion (product reference: "Made around this piece").
+{%- endcomment -%}
+{{ 'hh.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign hh_shelf = product.metafields.humble_haus.shelf.value | default: 'Original'
+  assign hh_is_print = false
+  if hh_shelf == 'In print'
+    assign hh_is_print = true
+  endif
+  assign hh_gone = false
+  if hh_is_print == false and product.available == false
+    assign hh_gone = true
+  endif
+
+  assign hh_house = nil
+  for c in product.collections
+    if c.metafields.humble_haus.house_number.value != blank
+      assign hh_house = c
+      break
+    endif
+  endfor
+
+  assign hh_credit = product.metafields.humble_haus.credit.value
+  assign hh_condition = product.metafields.humble_haus.condition.value
+  assign hh_size = product.metafields.humble_haus.size.value
+  assign hh_companion = product.metafields.humble_haus.companion.value
+  assign hh_variant = product.selected_or_first_available_variant
+-%}
+<div class="hh hh-piece{% if hh_gone %} hh-piece--gone{% endif %}">
+  <div class="hh-wrap">
+    {%- if hh_house -%}
+      <p class="hh-crumb hh-mono hh-soft">
+        <a href="{{ hh_house.url }}{% if section.settings.house_view != blank %}?view={{ section.settings.house_view }}{% endif %}">Haus {{ hh_house.metafields.humble_haus.house_number.value }} · {{ hh_house.title | escape }}</a>
+      </p>
+    {%- endif -%}
+
+    <div class="hh-piece__layout">
+      <div>
+        <div class="hh-piece__main">
+          {%- if product.featured_media -%}
+            {{ product.featured_media | image_url: width: 1600 | image_tag: widths: '600, 900, 1200, 1600', sizes: '(min-width: 990px) 60vw, 100vw', alt: product.featured_media.alt | default: product.title }}
+          {%- endif -%}
+        </div>
+        {%- assign hh_more_media = product.media | where: 'media_type', 'image' -%}
+        {%- if hh_more_media.size > 1 -%}
+          <div class="hh-piece__thumbs">
+            {%- for m in hh_more_media offset: 1 limit: 3 -%}
+              {{ m | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300, 600', sizes: '(min-width: 990px) 20vw, 33vw', alt: m.alt | default: product.title }}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div>
+        <div class="hh-piece__marks">
+          {%- render 'hh-piece-number', product: product -%}
+          <span class="hh-badge">{% if hh_is_print %}In print{% else %}Original{% endif %}</span>
+          {%- if hh_gone -%}<span class="hh-badge hh-badge--quiet">Gone</span>{%- endif -%}
+        </div>
+        <h1 class="hh-piece__title">{{ product.title | escape }}</h1>
+        {%- if hh_credit != blank -%}<p class="hh-piece__credit hh-soft">{{ hh_credit | escape }}</p>{%- endif -%}
+
+        {%- if product.description != blank -%}
+          <div class="hh-piece__body">{{ product.description }}</div>
+        {%- endif -%}
+
+        {%- if hh_condition != blank -%}
+          <p class="hh-piece__label">{% if hh_gone %}Condition, as sold{% else %}Condition{% endif %}</p>
+          <p class="hh-piece__value">{{ hh_condition | escape | newline_to_br }}</p>
+        {%- endif -%}
+        {%- if hh_size != blank -%}
+          <p class="hh-piece__label">Size</p>
+          <p class="hh-piece__value hh-mono">{{ hh_size | escape }}</p>
+        {%- endif -%}
+
+        {%- if hh_gone -%}
+          <p class="hh-piece__onrecord hh-mono hh-soft">{{ section.settings.gone_line | escape }}</p>
+        {%- else -%}
+          <p class="hh-piece__price hh-mono">{{ hh_variant.price | default: product.price | money }}</p>
+          <div class="hh-piece__buy">
+            {%- form 'product', product -%}
+              <input type="hidden" name="id" value="{{ hh_variant.id }}">
+              {%- if hh_variant.available -%}
+                <button class="hh-button" type="submit" name="add">{{ section.settings.button_label | escape }}</button>
+              {%- else -%}
+                <button class="hh-button" type="button" disabled>{{ section.settings.unavailable_label | escape }}</button>
+              {%- endif -%}
+            {%- endform -%}
+          </div>
+          <p class="hh-piece__promise hh-soft">
+            {%- unless hh_is_print -%}One of one. {% endunless -%}
+            {{ section.settings.promise | escape }}
+          </p>
+        {%- endif -%}
+
+        {%- if hh_companion != blank -%}
+          <a class="hh-companion" href="{{ hh_companion.url }}">
+            {%- if hh_companion.featured_media -%}
+              {{ hh_companion.featured_media | image_url: width: 160 | image_tag: loading: 'lazy', alt: hh_companion.title }}
+            {%- else -%}
+              <span></span>
+            {%- endif -%}
+            <span>
+              <span class="hh-companion__kicker">Made around this piece</span><br>
+              <span class="hh-companion__name">{{ hh_companion.title | escape }}</span><br>
+              <span class="hh-badge hh-badge--quiet" style="background: var(--hh-paper);">In print</span>
+              <span class="hh-companion__price hh-mono">{{ hh_companion.price | money }}</span>
+            </span>
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HH · Piece",
+  "class": "hh-section",
+  "settings": [
+    { "type": "text", "id": "button_label", "label": "Button", "default": "Add to bag" },
+    { "type": "text", "id": "unavailable_label", "label": "Button when an In print piece is out of stock", "default": "Not available right now" },
+    { "type": "text", "id": "promise", "label": "Shipping line", "default": "Ships within Canada, or pickup in Vancouver.", "info": "The same line on every piece. Add the returns promise here once it is decided." },
+    { "type": "text", "id": "gone_line", "label": "Gone line", "default": "Gone. Kept here on record." },
+    { "type": "text", "id": "house_view", "label": "House page view", "info": "Template suffix for the House link, e.g. 'house'. Leave empty once Houses use the House template." }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,25 @@
+{
+  "sections": {
+    "piece": {
+      "type": "hh-piece",
+      "settings": {
+        "button_label": "Add to bag",
+        "unavailable_label": "Not available right now",
+        "promise": "Ships within Canada, or pickup in Vancouver.",
+        "gone_line": "Gone. Kept here on record.",
+        "house_view": "house"
+      }
+    },
+    "more": {
+      "type": "hh-piece-more",
+      "settings": {
+        "signup_title": "Hear when Haus 002 is published",
+        "signup_sub": "One email per House. Nothing else.",
+        "signup_button": "Tell me",
+        "signup_thanks": "Thank you. One email when the next House is published.",
+        "signup_tags": "newsletter,hh-next-house"
+      }
+    }
+  },
+  "order": ["piece", "more"]
+}

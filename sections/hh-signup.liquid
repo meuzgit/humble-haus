@@ -1,0 +1,22 @@
+{%- comment -%}
+  One sign-up: "Hear when Haus 002 is published" (HH-024, HH-045).
+  No countdown, no early-access gate. Uses Shopify's customer form, which adds the
+  address as a marketing subscriber with the tags set below.
+{%- endcomment -%}
+{{ 'hh.css' | asset_url | stylesheet_tag }}
+{%- render 'hh-signup', title: section.settings.title, sub: section.settings.sub, button: section.settings.button, thanks: section.settings.thanks, tags: section.settings.tags -%}
+
+{% schema %}
+{
+  "name": "HH · Sign-up",
+  "class": "hh-section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "Hear when Haus 002 is published" },
+    { "type": "text", "id": "sub", "label": "Line", "default": "One email per House. Nothing else." },
+    { "type": "text", "id": "button", "label": "Button", "default": "Tell me" },
+    { "type": "text", "id": "thanks", "label": "After signing up", "default": "Thank you. One email when the next House is published." },
+    { "type": "text", "id": "tags", "label": "Customer tags", "default": "newsletter,hh-next-house" }
+  ],
+  "presets": [ { "name": "HH · Sign-up" } ]
+}
+{% endschema %}

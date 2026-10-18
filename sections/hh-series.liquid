@@ -1,0 +1,74 @@
+{%- comment -%}
+  "The series": the numbered list of Houses (HH-021, HH-045).
+  Published Houses are every collection with a humble_haus.house_number metafield,
+  sorted by that number. Houses not yet published are added as "Upcoming" blocks,
+  so nothing unpublished has to exist in the store to be listed.
+{%- endcomment -%}
+{{ 'hh.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign hh_keys = ''
+  for c in collections
+    assign c_no = c.metafields.humble_haus.house_number.value | strip
+    if c_no != blank
+      assign hh_keys = hh_keys | append: c_no | append: '|' | append: c.handle | append: ','
+    endif
+  endfor
+  assign hh_keys = hh_keys | split: ',' | sort
+-%}
+<div class="hh hh-series">
+  <div class="hh-wrap">
+    <h2 class="hh-series__title">{{ section.settings.title | escape }}</h2>
+    {%- if section.settings.lede != blank -%}<p class="hh-series__lede hh-soft">{{ section.settings.lede | escape }}</p>{%- endif -%}
+    <ol class="hh-series__list">
+      {%- for key in hh_keys -%}
+        {%- assign handle = key | split: '|' | last -%}
+        {%- assign c = collections[handle] -%}
+        {%- assign c_date = c.metafields.humble_haus.published_on.value -%}
+        <li class="hh-series__row">
+          <span class="hh-series__no hh-mono">{{ c.metafields.humble_haus.house_number.value }}</span>
+          <span>
+            <a class="hh-series__name" href="{{ c.url }}{% if section.settings.house_view != blank %}?view={{ section.settings.house_view }}{% endif %}">{{ c.title | escape }}</a>
+            {%- assign c_line = c.metafields.humble_haus.tagline.value -%}
+            {%- if c_line != blank -%}<span class="hh-series__line hh-soft">{{ c_line | escape }}</span>{%- endif -%}
+          </span>
+          <span class="hh-series__meta hh-soft">
+            {%- assign c_cover = c.metafields.humble_haus.cover_color.value -%}
+            {%- if c_cover != blank -%}<span class="hh-swatch" style="background: {{ c_cover }};"></span>{%- endif -%}
+            <span class="hh-mono">{% if c_date != blank %}Published {{ c_date | date: '%Y-%m-%d' }}{% else %}Published{% endif %}</span>
+          </span>
+        </li>
+      {%- endfor -%}
+      {%- for block in section.blocks -%}
+        <li class="hh-series__row hh-series__row--upcoming" {{ block.shopify_attributes }}>
+          <span class="hh-series__no hh-mono">{{ block.settings.number | escape }}</span>
+          <span class="hh-series__name">{{ block.settings.label | escape }}</span>
+          <span class="hh-series__meta"><span class="hh-mono">{{ block.settings.status | escape }}</span></span>
+        </li>
+      {%- endfor -%}
+    </ol>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HH · The series",
+  "class": "hh-section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "The series" },
+    { "type": "text", "id": "lede", "label": "Line", "default": "Humble Haus publishes Houses: numbered collections, each around a place or a mood." },
+    { "type": "text", "id": "house_view", "label": "House page view", "info": "Template suffix for House links, e.g. 'house'. Leave empty once Houses use the House template." }
+  ],
+  "blocks": [
+    {
+      "type": "upcoming",
+      "name": "Upcoming House",
+      "settings": [
+        { "type": "text", "id": "number", "label": "Number", "default": "002" },
+        { "type": "text", "id": "label", "label": "Label", "default": "In preparation" },
+        { "type": "text", "id": "status", "label": "Status", "default": "Not yet published" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "HH · The series" } ]
+}
+{% endschema %}

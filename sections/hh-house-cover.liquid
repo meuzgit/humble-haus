@@ -1,0 +1,97 @@
+{%- comment -%}
+  The House cover (HH-045): one colour field with the House number, name, line,
+  and one lived-in photograph (HH-033).
+  - "Front" style: the store front's first screen, with one button and the piece count.
+  - "Band" style: the short band at the top of a House page.
+  On a collection page the House is the current collection unless one is picked.
+{%- endcomment -%}
+{{ 'hh.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign house = section.settings.house
+  if house == blank
+    assign house = collection
+  endif
+  assign is_band = false
+  if section.settings.style == 'band'
+    assign is_band = true
+  endif
+-%}
+
+<div class="hh hh-cover{% if is_band %} hh-cover--band{% endif %}">
+  <div class="hh-wrap">
+    {%- if house != blank -%}
+      {%- liquid
+        assign hh_no = house.metafields.humble_haus.house_number.value
+        assign hh_line = house.metafields.humble_haus.tagline.value
+        assign hh_cover = house.metafields.humble_haus.cover_color.value | default: section.settings.fallback_cover
+        assign hh_date = house.metafields.humble_haus.published_on.value
+        assign hh_originals = 0
+        assign hh_print = 0
+        for p in house.products limit: 50
+          if p.metafields.humble_haus.shelf.value == 'In print'
+            assign hh_print = hh_print | plus: 1
+          else
+            assign hh_originals = hh_originals | plus: 1
+          endif
+        endfor
+        assign hh_total = hh_originals | plus: hh_print
+      -%}
+      <div class="hh-cover__field" style="--hh-cover: {{ hh_cover }}; background: var(--hh-cover);">
+        <div class="hh-cover__text">
+          <div>
+            {%- if hh_no != blank -%}<p class="hh-cover__number hh-mono">HAUS {{ hh_no }}</p>{%- endif -%}
+            {%- if hh_date != blank -%}
+              <p class="hh-cover__date hh-mono">Published {{ hh_date | date: '%Y-%m-%d' }}</p>
+            {%- endif -%}
+          </div>
+          <div>
+            {%- if is_band -%}
+              <h1 class="hh-cover__name">{{ house.title | escape }}</h1>
+            {%- else -%}
+              <h2 class="hh-cover__name">{{ house.title | escape }}</h2>
+            {%- endif -%}
+            {%- if hh_line != blank -%}<p class="hh-cover__line">{{ hh_line | escape }}</p>{%- endif -%}
+            <div class="hh-cover__foot">
+              {%- unless is_band -%}
+                <a class="hh-button" href="{{ house.url }}{% if section.settings.house_view != blank %}?view={{ section.settings.house_view }}{% endif %}">{{ section.settings.button_label | escape }}</a>
+              {%- endunless -%}
+              <span class="hh-mono">
+                {{- hh_total }} {% if hh_total == 1 %}piece{% else %}pieces{% endif %}
+                {%- unless is_band %} · {{ hh_originals }} {% if hh_originals == 1 %}Original{% else %}Originals{% endif %} · {{ hh_print }} In print{% endunless -%}
+              </span>
+            </div>
+          </div>
+        </div>
+        {%- if house.featured_image -%}
+          <div class="hh-cover__media">
+            {{ house.featured_image | image_url: width: 1400 | image_tag: widths: '600, 900, 1200, 1400', sizes: '(min-width: 750px) 50vw, 100vw', alt: house.featured_image.alt | default: house.title }}
+          </div>
+        {%- endif -%}
+      </div>
+      {%- if is_band and section.settings.show_intro and house.description != blank -%}
+        <div class="hh-intro">{{ house.description }}</div>
+      {%- endif -%}
+    {%- else -%}
+      <div class="hh-cover__field"><p>Pick a House for this cover in the theme editor.</p></div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HH · House cover",
+  "class": "hh-section",
+  "settings": [
+    { "type": "collection", "id": "house", "label": "House", "info": "Leave empty on a House page to use that House." },
+    {
+      "type": "select", "id": "style", "label": "Style", "default": "front",
+      "options": [ { "value": "front", "label": "Front (store front)" }, { "value": "band", "label": "Band (House page)" } ]
+    },
+    { "type": "text", "id": "button_label", "label": "Button", "default": "See the House" },
+    { "type": "text", "id": "house_view", "label": "House page view", "info": "Template suffix used for the House link, e.g. 'house'. Leave empty once Houses use the House template." },
+    { "type": "checkbox", "id": "show_intro", "label": "Show the House's two sentences (band only)", "default": true },
+    { "type": "color", "id": "fallback_cover", "label": "Cover colour if the House has none", "default": "#E7E6EF" }
+  ],
+  "presets": [ { "name": "HH · House cover" } ]
+}
+{% endschema %}

@@ -1,0 +1,85 @@
+{%- comment -%}
+  What follows a piece, so no piece is a dead end (HH-045 screens 03 and 04).
+  - A live piece: "Next in Haus 001", one link to the next piece in its House.
+  - A gone piece: "Still in Haus 001", two live pieces from its House, then the sign-up.
+{%- endcomment -%}
+{{ 'hh.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign hh_shelf = product.metafields.humble_haus.shelf.value | default: 'Original'
+  assign hh_gone = false
+  if hh_shelf != 'In print' and product.available == false
+    assign hh_gone = true
+  endif
+
+  assign hh_house = nil
+  for c in product.collections
+    if c.metafields.humble_haus.house_number.value != blank
+      assign hh_house = c
+      break
+    endif
+  endfor
+-%}
+{%- if hh_house -%}
+  {%- assign hh_no = hh_house.metafields.humble_haus.house_number.value -%}
+  <div class="hh hh-more">
+    <div class="hh-wrap">
+      {%- if hh_gone -%}
+        <h2 class="hh-more__title">Still in Haus {{ hh_no }}</h2>
+        <div class="hh-grid">
+          {%- assign hh_shown = 0 -%}
+          {%- for p in hh_house.products limit: 50 -%}
+            {%- if p.id != product.id and p.available and hh_shown < 2 -%}
+              {%- render 'hh-piece-card', product: p -%}
+              {%- assign hh_shown = hh_shown | plus: 1 -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- else -%}
+        {%- liquid
+          assign hh_next = nil
+          assign hh_seen = false
+          for p in hh_house.products limit: 50
+            if hh_seen
+              assign hh_next = p
+              break
+            endif
+            if p.id == product.id
+              assign hh_seen = true
+            endif
+          endfor
+          if hh_next == nil
+            assign hh_next = hh_house.products.first
+          endif
+        -%}
+        {%- if hh_next and hh_next.id != product.id -%}
+          <p class="hh-next hh-soft">Next in Haus {{ hh_no }}</p>
+          <p class="hh-next hh-mono">
+            <a href="{{ hh_next.url }}">
+              {%- assign hh_next_no = hh_next.metafields.humble_haus.piece_number.value -%}
+              {%- if hh_next_no != blank -%}{{ hh_next_no }} · {% endif -%}
+              {{ hh_next.title | escape }} →
+            </a>
+          </p>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+  </div>
+  {%- if hh_gone and section.settings.signup_title != blank -%}
+    {%- render 'hh-signup', title: section.settings.signup_title, sub: section.settings.signup_sub, button: section.settings.signup_button, thanks: section.settings.signup_thanks, tags: section.settings.signup_tags -%}
+  {%- endif -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "HH · After a piece",
+  "class": "hh-section",
+  "settings": [
+    { "type": "header", "content": "Sign-up under a gone piece" },
+    { "type": "text", "id": "signup_title", "label": "Heading", "default": "Hear when Haus 002 is published", "info": "Leave empty to hide." },
+    { "type": "text", "id": "signup_sub", "label": "Line", "default": "One email per House. Nothing else." },
+    { "type": "text", "id": "signup_button", "label": "Button", "default": "Tell me" },
+    { "type": "text", "id": "signup_thanks", "label": "After signing up", "default": "Thank you. One email when the next House is published." },
+    { "type": "text", "id": "signup_tags", "label": "Customer tags", "default": "newsletter,hh-next-house" }
+  ]
+}
+{% endschema %}

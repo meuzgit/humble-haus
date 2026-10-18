@@ -1,0 +1,13 @@
+{%- comment -%}
+  The piece number in mono, e.g. "001 / 01" (Original) or "001 / P1" (In print).
+  Reads the product metafield humble_haus.piece_number. Prints nothing if it is not set,
+  so no number is ever invented.
+
+  Accepts:
+  - product: {Object}
+  - class: {String} optional extra classes
+{%- endcomment -%}
+{%- assign hh_number = product.metafields.humble_haus.piece_number.value | strip -%}
+{%- if hh_number != blank -%}
+  <span class="hh-mono {{ class }}">{{ hh_number }}</span>
+{%- endif -%}

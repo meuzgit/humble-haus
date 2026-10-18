@@ -1,0 +1,177 @@
+/*
+  Humble Haus layer on Savor (HH-045, jobs' look).
+  Everything is scoped under .hh so Savor's own sections are untouched.
+  Type: system sans and mono stacks. On Apple devices these resolve to
+  SF Pro and SF Mono from the device itself; no font file is served,
+  so this does not depend on SF Pro being licensed for the web.
+*/
+
+.hh {
+  --hh-ink: #1f1c5b;
+  --hh-ink-soft: #6b698f; /* not on --hh-tint: 4.2:1 */
+  --hh-tint: #e7e6ef;
+  --hh-paper: #ffffff;
+  --hh-cover: var(--hh-tint);
+  --hh-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --hh-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, "Liberation Mono", Consolas, monospace;
+  --hh-gutter: clamp(16px, 4vw, 48px);
+  --hh-max: 1200px;
+
+  background: var(--hh-paper);
+  color: var(--hh-ink);
+  font-family: var(--hh-sans);
+  line-height: 1.45;
+}
+
+.hh *,
+.hh *::before,
+.hh *::after { box-sizing: border-box; }
+
+.hh a { color: inherit; text-decoration: none; }
+.hh a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.hh p { margin: 0; }
+.hh h1, .hh h2, .hh h3 { margin: 0; color: var(--hh-ink); font-family: var(--hh-sans); letter-spacing: -0.01em; }
+
+.hh-wrap { max-width: var(--hh-max); margin: 0 auto; padding: 0 var(--hh-gutter); }
+.hh-mono { font-family: var(--hh-mono); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.hh-soft { color: var(--hh-ink-soft); }
+.hh-caps { text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* Buttons and badges: the ink pill and capsules (SSR-017) */
+.hh-button {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 40px; padding: 0 20px;
+  border: 0; border-radius: 999px;
+  background: var(--hh-ink); color: var(--hh-paper);
+  font: 600 14px/1 var(--hh-sans); cursor: pointer;
+}
+.hh-button:hover { text-decoration: none; opacity: 0.9; }
+.hh-button[disabled] { background: var(--hh-tint); color: var(--hh-ink); cursor: default; opacity: 1; }
+
+.hh-badge {
+  display: inline-block; padding: 3px 10px; border-radius: 999px;
+  font: 600 12px/1.2 var(--hh-sans);
+  background: var(--hh-ink); color: var(--hh-paper);
+}
+.hh-badge--quiet { background: var(--hh-tint); color: var(--hh-ink); }
+
+/* Cover: one colour field per House */
+.hh-cover { padding: 24px 0; }
+.hh-cover__field {
+  display: grid; grid-template-columns: 1fr; gap: 24px;
+  padding: clamp(20px, 4vw, 40px);
+  background: var(--hh-cover);
+}
+.hh-cover__number { font-size: 13px; font-weight: 700; }
+.hh-cover__date { font-size: 12px; margin-top: 4px; }
+.hh-cover__name { font-size: clamp(36px, 6vw, 64px); line-height: 1.02; font-weight: 700; margin-top: 32px; }
+.hh-cover__line { font-size: 17px; margin-top: 10px; }
+.hh-cover__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 24px; font-size: 12px; }
+.hh-cover__media { aspect-ratio: 4 / 3; background: rgba(255, 255, 255, 0.35); overflow: hidden; }
+.hh-cover__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hh-cover--band .hh-cover__name { font-size: clamp(30px, 4.5vw, 44px); margin-top: 16px; }
+.hh-cover--band .hh-cover__media { aspect-ratio: 16 / 9; }
+@media (min-width: 750px) {
+  .hh-cover__field { grid-template-columns: 1fr 1fr; align-items: stretch; }
+  .hh-cover__text { display: flex; flex-direction: column; justify-content: space-between; min-height: 100%; }
+  .hh-cover--band .hh-cover__field { grid-template-columns: 3fr 2fr; }
+}
+
+.hh-intro { max-width: 62ch; margin: 8px 0 32px; font-size: 16px; }
+
+/* The series list */
+.hh-series { padding: 32px 0; }
+.hh-series__title { font-size: 18px; font-weight: 700; }
+.hh-series__lede { font-size: 13px; margin-top: 4px; max-width: 52ch; }
+.hh-series__list { list-style: none; margin: 16px 0 0; padding: 0; border-top: 1px solid var(--hh-tint); }
+.hh-series__row {
+  display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: center;
+  padding: 14px 0; border-bottom: 1px solid var(--hh-tint);
+}
+.hh-series__row--upcoming { color: var(--hh-ink-soft); }
+.hh-series__no { font-weight: 700; }
+.hh-series__name { font-weight: 600; }
+.hh-series__line { font-size: 13px; margin-left: 10px; }
+.hh-series__meta { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.hh-swatch { width: 14px; height: 10px; display: inline-block; }
+
+/* Sign-up */
+.hh-signup { padding: 24px 0 40px; }
+.hh-signup__box {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 24px; background: var(--hh-tint);
+}
+.hh-signup__title { font-size: 16px; font-weight: 700; }
+.hh-signup__sub { font-size: 13px; margin-top: 4px; } /* ink, not soft ink, on the tint */
+.hh-signup__form { display: flex; gap: 8px; flex-wrap: wrap; }
+.hh-signup__input {
+  min-height: 40px; min-width: 220px; padding: 0 16px;
+  border: 0; border-radius: 999px; background: var(--hh-paper); color: var(--hh-ink);
+  font: 14px var(--hh-sans);
+}
+.hh-signup__note { font-size: 13px; width: 100%; }
+
+/* Shelves */
+.hh-shelf { padding: 8px 0 40px; }
+.hh-shelf__head {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 24px;
+  border-top: 2px solid var(--hh-ink); padding-top: 14px; margin-bottom: 20px;
+}
+.hh-shelf__title { font-size: 18px; font-weight: 700; }
+.hh-shelf__line { font-size: 13px; }
+.hh-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 16px; }
+@media (min-width: 750px) { .hh-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px 24px; } }
+
+/* Piece card */
+.hh-card { display: block; }
+.hh-card__media { aspect-ratio: 1 / 1; background: #ececee; overflow: hidden; position: relative; }
+.hh-card__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hh-card__tag { position: absolute; top: 10px; right: 10px; }
+.hh-card__no { font-size: 12px; margin-top: 10px; }
+.hh-card__name { font-size: 15px; font-weight: 600; margin-top: 2px; }
+.hh-card__credit { font-size: 13px; margin-top: 2px; }
+.hh-card__price { font-size: 13px; font-weight: 700; margin-top: 4px; }
+.hh-card--gone .hh-card__media img { opacity: 0.5; }
+.hh-card--gone .hh-card__name,
+.hh-card--gone .hh-card__price { color: var(--hh-ink-soft); font-weight: 600; }
+
+/* Piece page */
+.hh-piece { padding: 16px 0 40px; }
+.hh-crumb { font-size: 12px; margin-bottom: 16px; }
+.hh-piece__layout { display: grid; grid-template-columns: 1fr; gap: 28px; }
+@media (min-width: 990px) { .hh-piece__layout { grid-template-columns: 3fr 2fr; gap: 48px; } }
+.hh-piece__main { aspect-ratio: 1 / 1; background: #ececee; overflow: hidden; }
+.hh-piece__main img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.hh-piece__thumbs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+.hh-piece__thumbs img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; background: #ececee; }
+.hh-piece--gone .hh-piece__main img,
+.hh-piece--gone .hh-piece__thumbs img { opacity: 0.5; }
+.hh-piece__marks { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; }
+.hh-piece__title { font-size: clamp(26px, 3.4vw, 34px); font-weight: 700; margin-top: 12px; }
+.hh-piece__credit { font-size: 14px; margin-top: 4px; }
+.hh-piece__body { font-size: 15px; margin-top: 16px; max-width: 52ch; }
+.hh-piece__body p + p { margin-top: 10px; }
+.hh-piece__label { font-size: 13px; font-weight: 700; margin-top: 18px; }
+.hh-piece__value { font-size: 14px; margin-top: 2px; }
+.hh-piece__price { font-size: 20px; font-weight: 700; margin-top: 22px; }
+.hh-piece__buy { margin-top: 12px; }
+.hh-piece__promise { font-size: 12px; margin-top: 12px; max-width: 46ch; }
+.hh-piece__onrecord { font-size: 13px; margin-top: 22px; }
+
+.hh-companion {
+  display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center;
+  margin-top: 24px; padding: 12px; background: var(--hh-tint);
+}
+.hh-companion img { width: 64px; height: 64px; object-fit: cover; display: block; background: var(--hh-paper); }
+.hh-companion__kicker { font-size: 12px; }
+.hh-companion__name { font-size: 14px; font-weight: 700; }
+.hh-companion__price { font-size: 12px; font-weight: 700; margin-top: 2px; }
+
+.hh-more { padding: 8px 0 24px; }
+.hh-more__title { font-size: 18px; font-weight: 700; margin-bottom: 16px; padding-top: 20px; border-top: 1px solid var(--hh-tint); }
+.hh-next { font-size: 13px; }
+
+.hh .visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
